@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Изтича{% endblock %}
+
+{% block content %}
+<div class="card">
+  <h2>Изтичащи застраховки (следващите {{ window_days }} дни)</h2>
+
+  {% if insurances %}
+    <table>
+      <thead>
+        <tr>
+          <th>Крайна дата</th>
+          <th>Автомобил</th>
+          <th>Полица</th>
+          <th>Тип</th>
+          <th>Действия</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ins in insurances %}
+          <tr>
+            <td>{{ ins.end_date }}</td>
+            <td>
+              <a href="{% url 'vehicles:detail' ins.vehicle.id %}">{{ ins.vehicle.registration_number }}</a>
+              <div class="muted">VIN: {{ ins.vehicle.vin_num }}</div>
+            </td>
+            <td><a href="{% url 'insurance:detail' ins.id %}">{{ ins.policy_num }}</a></td>
+            <td>{{ ins.ins_types }}</td>
+            <td class="actions">
+              <a class="btn light" href="{% url 'insurance:edit' ins.id %}">Редактирай</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <div class="muted">Няма изтичащи застраховки за този период.</div>
+  {% endif %}
+</div>
+{% endblock %}

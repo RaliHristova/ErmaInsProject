@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% load currency %}
+{% block title %}Insurance{% endblock %}
+
+{% block content %}
+<div class="card">
+  <h2>Полица #{{ insurance.policy_num }}</h2>
+  <div class="muted">{{ insurance.ins_types }}</div>
+
+  <p>
+    Автомобил:
+    <a href="{% url 'vehicles:detail' insurance.vehicle.id %}">{{ insurance.vehicle.registration_number }}</a>
+    <br>
+    VIN: {{ insurance.vehicle.vin_num }}<br>
+    Период: {{ insurance.start_date|date:"d/m/Y" }} → {{ insurance.end_date|date:"d/m/Y" }}<br>
+    Стойност: {{ insurance.payment_value|floatformat:2|bgn }}<br>
+    Вноски: {{ insurance.rescheduled }}<br>
+    Следващ падеж: {{ insurance.rescheduled_date|date:"d/m/Y"|default:"—" }}
+  </p>
+
+  <div class="actions">
+    <a class="btn primary" href="{% url 'insurance:edit' insurance.id %}">Редактирай</a>
+    <a class="btn light" href="{% url 'payments:by_insurance' insurance.id %}">Детайли плащания</a>
+    <a class="btn light" href="{% url 'insurance:list' %}">Обратно</a>
+  </div>
+</div>
+
+<div class="card" style="margin-top:16px;">
+  <h2>Плащания</h2>
+
+  {% if payments %}
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Падежна дата</th>
+          <th>Стойност</th>
+          <th>Статус</th>
+          <th>Платена на</th>
+          <th>Действия</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in payments %}
+          <tr>
+            <td>{{ p.installment_no }}</td>
+            <td>{{ p.due_date }}</td>
+            <td>{{ p.amount|floatformat:2|bgn }}</td>
+            <td>{{ p.get_status_display|default:"PENDING" }}</td>
+            <td>{{ p.paid_at|default:"—" }}</td>
+            <td class="actions">
+              <a class="btn light" href="{% url 'payments:detail' p.id %}">Виж</a>
+              {% if p.status != "PAID" %}
+                <form action="{% url 'payments:mark_paid' p.id %}" method="post" style="margin:0;">
+                  {% csrf_token %}
+                  <button class="btn primary" type="submit">Маркирай платена</button>
+                </form>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <div class="muted">Все още няма плащания.</div>
+  {% endif %}
+</div>
+{% endblock %}

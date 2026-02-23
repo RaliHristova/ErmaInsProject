@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Автомобил{% endblock %}
+
+{% block content %}
+<div class="card">
+  <h2>{{ vehicle.registration_number }}</h2>
+  <div class="muted">VIN: {{ vehicle.vin_num }}</div>
+
+  <p>
+    Марка/Модел: {{ vehicle.make }} {{ vehicle.model }}<br>
+    Гориво: {{ vehicle.get_type_of_fuel_display }}<br>
+    Двигател: {{ vehicle.engine_capacity }}<br>
+    Първа регист.: {{ vehicle.date_of_first_registration|date:"d/m/Y" }}<br>
+    Цвят: {{ vehicle.color }}<br>
+  </p>
+  <p>
+    Собственик:
+    {% if vehicle.owner %}
+      <a href="{% url 'customers:detail' vehicle.owner.id %}">{{ vehicle.owner.first_name }} {{ vehicle.owner.last_name }}</a>
+    {% else %}
+      —
+    {% endif %}
+  </p>
+
+  <div class="actions">
+    <a class="btn primary" href="{% url 'vehicles:edit' vehicle.id %}">Редактирай</a>
+    <a class="btn light" href="{% url 'vehicles:list' %}">Назад</a>
+  </div>
+</div>
+
+<div class="card" style="margin-top:16px;">
+  <h2>Застраховки</h2>
+  <div class="actions">
+    <a class="btn primary" href="{% url 'insurance:create' %}">+ Добави</a>
+    <a class="btn light" href="{% url 'insurance:by_vehicle' vehicle.id %}">Детайлна информация</a>
+  </div>
+
+  {% if insurances %}
+    <table>
+      <thead>
+        <tr>
+          <th>№ полица</th>
+          <th>Тип</th>
+          <th>Започва</th>
+          <th>Завършва</th>
+          <th>Вноски</th>
+          <th>Падеж</th>
+          <th>Плащания</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ins in insurances %}
+          <tr>
+            <td><a href="{% url 'insurance:detail' ins.id %}">{{ ins.policy_num }}</a></td>
+            <td>{{ ins.get_ins_types_display }}</td>
+            <td>{{ ins.start_date|date:"d/m/Y" }}</td>
+            <td>{{ ins.end_date|date:"d/m/Y" }}</td>
+            <td>{{ ins.rescheduled }}</td>
+            <td>{{ ins.rescheduled_date|default:"—" }}</td>
+            <td class="actions">
+              <a class="btn light" href="{% url 'insurance:detail' ins.id %}">Виж</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <div class="muted">Няма засртаховки за този автомобил.</div>
+  {% endif %}
+</div>
+
+
+{% endblock %}

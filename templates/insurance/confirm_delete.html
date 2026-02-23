@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Изтрий запис{% endblock %}
+
+{% block content %}
+<div class="card">
+  <h2>Изртий</h2>
+  <p>Сигурни ли сте, че искате да изтриете: <strong>Полица № {{ object.policy_num }}</strong>?</p>
+
+  <form method="post">
+    {% csrf_token %}
+    <div class="actions">
+      <button class="btn primary" type="submit">Да, изтрий</button>
+      <a class="btn light" href="{% url 'insurance:list' %}">Отказ</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

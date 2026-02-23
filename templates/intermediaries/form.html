@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Форма посредник{% endblock %}
+
+{% block content %}
+<div class="card">
+  <h2>Форма посредник</h2>
+
+  <form method="post">
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+      <div class="form-errors">
+        {% for e in form.non_field_errors %}
+          <div>{{ e }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% for field in form %}
+      <div class="form-row {% if field.errors %}field-error{% endif %}">
+        {% if field.field.widget.input_type == "checkbox" %}
+          <label for="{{ field.id_for_label }}" class="inline-checkbox-label">
+            {{ field }} {{ field.label }}
+          </label>
+        {% else %}
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+        {% endif %}
+
+        {% if field.help_text %}
+          <div class="help-text">{{ field.help_text }}</div>
+        {% endif %}
+
+        {% for e in field.errors %}
+          <div class="error-text">{{ e }}</div>
+        {% endfor %}
+      </div>
+    {% endfor %}
+
+    <div class="actions">
+      <button class="btn primary" type="submit">Съхрани</button>
+      <a class="btn light" href="{% url 'intermediaries:list' %}">Отказ</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

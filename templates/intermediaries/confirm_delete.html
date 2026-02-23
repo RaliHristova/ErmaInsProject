@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Изтрий посредник{% endblock %}
+
+{% block content %}
+<div class="card">
+  <h2>Изтрий посредник</h2>
+  <p>Сигурни ли сте, че искате да изтриете: <strong>{{ object }}</strong>?</p>
+
+  <form method="post">
+    {% csrf_token %}
+    <div class="actions">
+      <button class="btn primary" type="submit">Да, изтрий</button>
+      <a class="btn light" href="{% url 'intermediaries:list' %}">Отказ</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

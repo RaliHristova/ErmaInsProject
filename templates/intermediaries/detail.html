@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Посредник{% endblock %}
+
+{% block content %}
+<div class="card">
+  <h2>{{ intermediary.name }}</h2>
+  <p>
+    Лиценз: <strong>{{ intermediary.license_no }}</strong><br>
+    Телефон: {{ intermediary.phone }}<br>
+    Имейл: {{ intermediary.email|default:"—" }}<br>
+    Статус:
+    {% if intermediary.is_active %}Активен{% else %}Неактивен{% endif %}
+  </p>
+
+  <div class="actions">
+    <a class="btn primary" href="{% url 'intermediaries:update' intermediary.id %}">Редактирай</a>
+    <a class="btn light" href="{% url 'intermediaries:list' %}">Назад</a>
+  </div>
+</div>
+
+<div class="card" style="margin-top: 16px;">
+  <h2>Клиенти на посредника</h2>
+  {% if customers %}
+  <ul>
+    {% for c in customers %}
+      <li>
+        <a href="{% url 'customers:detail' c.id %}">
+          {{ c.first_name }} {{ c.last_name }}
+        </a>
+        — тел:{{ c.tel_num }}
+      </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+    <div class="muted">Няма свързани клиенти.</div>
+  {% endif %}
+
+</div>
+{% endblock %}

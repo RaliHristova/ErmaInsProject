@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Посредници{% endblock %}
+
+{% block content %}
+<div class="card">
+  <h2>Посредници</h2>
+  <div class="actions">
+    <a class="btn primary" href="{% url 'intermediaries:create' %}">+ Добави посредник</a>
+  </div>
+
+  {% if intermediaries %}
+    <table>
+      <thead>
+        <tr>
+          
+          <th>Име</th>
+          <th>Лиценз</th>
+          <th>Телефон</th>
+          <th>Email</th>
+          <th>Статус</th>
+          <th>Действия</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for i in intermediaries %}
+          <tr>
+            
+            <td><a href="{% url 'intermediaries:detail' i.id %}">{{ i.name }}</a></td>
+            <td>{{ i.license_no }}</td>
+            <td>{{ i.phone }}</td>
+            <td>{{ i.email|default:"—" }}</td>
+            <td>
+              {% if i.is_active %}
+                <span class="badge blue">Активен</span>
+              {% else %}
+                <span class="badge gray">Неактивен</span>
+              {% endif %}
+            </td>
+            <td class="actions">
+              <a class="btn light" href="{% url 'intermediaries:update' i.id %}">Редактирай</a>
+              <a class="btn light" href="{% url 'intermediaries:delete' i.id %}">Изтрий</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <div class="muted">Няма добавени посредници.</div>
+  {% endif %}
+</div>
+{% endblock %}

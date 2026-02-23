@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+{% load currency %}
+{% block title %}Начало{% endblock %}
+ 
+{% block content %}
+    <p>Дата: {{ today|date:"d/m/Y" }}</p>
+   
+  <div class="card">
+    <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+       <h1 style="margin: 0;color: hotpink"> * Ще го направим за вас! </h1>
+      
+      <form method="get" style="display: flex; align-items: flex-end; gap: 1px; margin: 0;">
+        <div class="form-row" style="margin: 0; min-width: 120px;">
+          <label for="registration_number">автомобил с регистрационен номер:</label>
+
+          <input type="text" id="registration_number" name="registration_number" placeholder="AA1111AA"
+            value="{{ registration_number_query }}">
+        </div>
+        <button class="btn primary" type="submit">Търси</button>
+      </form>
+    
+    </div>
+   
+    
+    <div class="card" style="margin-top: 8px;">
+      <h2 style="text-decoration: underline;"> Просрочени:</h2>
+      {% if overdue_payments %}
+        <table>
+          <thead>
+            <tr>
+              <th>Падеж</th>
+              <th>По полица №</th>  
+              <th>Автомобил</th>
+              
+              <th>Номер вноска</th>
+              <th>Стойност</th>
+              <th>Действия</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in overdue_payments %}
+              <tr>
+                <td>{{ p.due_date|date:"d/m/Y" }}
+                <td>
+                  <a href="{% url 'insurance:detail' p.insurance.id %}">
+                    {{ p.insurance.policy_num }}
+                  </a>
+                </td>    
+                  
+                <td>
+                  <a href="{% url 'vehicles:detail' p.vehicle.id %}">
+                    {{ p.vehicle.registration_number }}
+                  </a>
+                </td>
+                
+                <td>{{ p.installment_no }}</td>
+                <td>{{ p.amount|floatformat:2|bgn }}</td>
+                <td class="actions">
+                  <a class="btn light" href="{% url 'payments:detail' p.id %}">Виж</a>
+
+                  <form action="{% url 'payments:mark_paid' p.id %}" method="post" style="margin: 0;">
+                    {% csrf_token %}
+                    <button class="btn primary" type="submit">Маркирай платено</button>
+                  </form>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <div class="muted">Няма просрочени плащания.</div>
+      {% endif %}
+    </div>
+
+    <div class="card" style="margin-top: 16px;">
+      <h2 style="text-decoration: underline;">Предстоящи плащания (до {{ window_days }} дни):</h2>
+      {% if upcoming_payments %}
+        <table>
+          <thead>
+            <tr>
+              <th>Падеж</th>
+              <th>По полица №</th>  
+              <th>Автомобил</th>
+              
+              <th>Номер вноска</th>
+              <th>Стойност</th>
+              <th>Действия</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in upcoming_payments %}
+              <tr>
+                <td>{{ p.due_date|date:"d/m/Y" }}</td>
+                <td>
+                  <a href="{% url 'insurance:detail' p.insurance.id %}">
+                    {{ p.insurance.policy_num }}
+                  </a>
+                </td>  
+                <td>
+                  <a href="{% url 'vehicles:detail' p.vehicle.id %}">
+                    {{ p.vehicle.registration_number }}
+                  </a>
+                </td>
+                
+                <td>{{ p.installment_no }}</td>
+                <td>{{ p.amount|floatformat:2|bgn }}</td>
+                <td class="actions">
+                  <a class="btn light" href="{% url 'payments:detail' p.id %}">Виж</a>
+
+                  <form action="{% url 'payments:mark_paid' p.id %}" method="post" style="margin: 0;">
+                    {% csrf_token %}
+                    <button class="btn primary" type="submit">Маркирай платено</button>
+                  </form>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <div class="muted">Няма предстоящи плащания за този период.</div>
+      {% endif %}
+    </div>
+
+  <div class="card" style="margin-top: 16px;">
+    <h2 style="text-decoration: underline;">Изтичащи застраховки (до {{ window_days }} дни):</h2>
+
+    {% if expiring_insurances %}
+      <table>
+        <thead>
+          <tr>
+            <th>Крайна дата</th>
+            <th>Автомобил</th>
+            <th>Тип застраховка</th>
+            <th>Полица №</th>
+            <th>Действия</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ins in expiring_insurances %}
+            <tr>
+              <td>{{ ins.end_date|date:"d/m/Y" }}</td>
+              <td>
+                <a href="{% url 'vehicles:detail' ins.vehicle.id %}">
+                  {{ ins.vehicle.registration_number }}
+                </a>
+                
+              </td>
+              <td>{{ ins.get_ins_types_display }}</td>
+              <td>
+                <a href="{% url 'insurance:detail' ins.id %}">
+                  {{ ins.policy_num }}
+                </a>
+              </td>
+              <td class="actions">
+                <a class="btn light" href="{% url 'insurance:edit' ins.id %}">Редактирай</a>
+                <a class="btn light" href="{% url 'insurance:detail' ins.id %}">Виж</a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <div class="muted">Няма изтичащи полици за този период.</div>
+    {% endif %}
+  </div>
+{% endblock %}
+</div>

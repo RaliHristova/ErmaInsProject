@@ -1,0 +1,64 @@
+﻿{% extends "base.html" %}
+{% block title %}Клиент{% endblock %}
+
+{% block content %}
+<div class="card">
+  <h2>{{ customer.first_name }} {{ customer.last_name }}</h2>
+  <div class="muted">ЕГН: {{ customer.owner_ucn }}</div>
+
+  <p>
+    Тел: {{ customer.tel_num }}<br>
+    Град: {{ customer.city }}<br>
+    Адрес: {{ customer.address }}<br>
+    Имейл: {{ customer.email|default:"—" }}
+  </p>
+
+  <p>
+    Посредници:<br>
+    {% with linked_intermediaries=customer.intermediaries.all %}
+      {% if linked_intermediaries %}
+        {% for i in linked_intermediaries %}
+          <a href="{% url 'intermediaries:detail' i.id %}">{{ i.name }}</a><br>
+        {% endfor %}
+      {% else %}
+        —
+      {% endif %}
+    {% endwith %}
+  </p>
+
+  <div class="actions">
+    <a class="btn primary" href="{% url 'customers:edit' customer.id %}">Редактирай</a>
+    <a class="btn light" href="{% url 'customers:list' %}">Обратно</a>
+  </div>
+</div>
+
+<div class="card" style="margin-top:16px;">
+  <h2>Автомобили на този клиент</h2>
+  {% if vehicles %}
+    <table>
+      <thead>
+        <tr>
+          <th>Рег.№</th>
+          <th>Марка/Модел</th>
+          <th>VIN</th>
+          <th>Застаховки на този автомобил</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for v in vehicles %}
+          <tr>
+            <td><a href="{% url 'vehicles:detail' v.id %}">{{ v.registration_number }}</a></td>
+            <td>{{ v.make }} {{ v.model }}</td>
+            <td>{{ v.vin_num }}</td>
+            <td class="actions">
+              <a class="btn light" href="{% url 'vehicles:detail' v.id %}">Виж</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <div class="muted">Няма автомобили за този клиент.</div>
+  {% endif %}
+</div>
+{% endblock %}

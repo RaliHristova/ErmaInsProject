@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load currency %}
+{% block title %}Плащане{% endblock %}
+
+{% block content %}
+<div class="card">
+  <h2>Плащане № {{ payment.installment_no }}</h2>
+
+  <p>
+    Автомобил:
+    <a href="{% url 'vehicles:detail' payment.vehicle.id %}">{{ payment.vehicle.registration_number }}</a>
+    <br>
+    Номер полица:
+    <a href="{% url 'insurance:detail' payment.insurance.id %}">{{ payment.insurance.policy_num }}</a>
+    <br>
+    Падеж: {{ payment.due_date }}<br>
+    Стойност вноска: {{ payment.amount|floatformat:2|bgn }}<br>
+    Статус: {{ payment.get_status_display|default:"PENDING" }}<br>
+    Платена на: {{ payment.paid_at|default:"—" }}
+  </p>
+
+  <div class="actions">
+    {% if payment.status != "PAID" %}
+      <form action="{% url 'payments:mark_paid' payment.id %}" method="post" style="margin:0;">
+        {% csrf_token %}
+        <button class="btn primary" type="submit">Маркирай платено</button>
+      </form>
+    {% endif %}
+    <a class="btn light" href="{% url 'payments:list' %}">Назад</a>
+  </div>
+</div>
+{% endblock %}

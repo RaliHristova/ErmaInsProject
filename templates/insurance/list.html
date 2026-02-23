@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% load currency %}
+{% block title %}Застраховки{% endblock %}
+
+{% block content %}
+<div class="card">
+  <h2>Застраховки{% if vehicle %} (Vehicle: {{ vehicle.registration_number }}){% endif %}</h2>
+  <div class="actions">
+    <a class="btn primary" href="{% url 'insurance:create' %}">+ Добави застраховка</a>
+    <a class="btn light" href="{% url 'insurance:expiring' %}">Изтичащи</a>
+  </div>
+
+  {% if insurances %}
+    <table>
+      <thead>
+        <tr>
+          <th>Полица</th>
+          <th>Автомобил</th>
+          <th>Тип</th>
+          <th>Начало</th>
+          <th>Край</th>
+          <th>Обща стойност</th>
+          <th>Вноски</th>
+          <th>Следващ падеж</th>
+          
+          <th>Действия</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ins in insurances %}
+          <tr>
+            <td><a href="{% url 'insurance:detail' ins.id %}">{{ ins.policy_num }}</a></td>
+            <td>
+              <a href="{% url 'vehicles:detail' ins.vehicle.id %}">
+                {{ ins.vehicle.registration_number }}
+              </a>
+              <div class="muted"> {{ ins.vehicle.make }} {{ ins.vehicle.model }}</div>
+            </td>
+            <td>{{ ins.get_ins_types_display }}</td>
+            <td>{{ ins.start_date|date:"d/m/Y" }}</td>
+            <td>{{ ins.end_date|date:"d/m/Y"  }}</td>
+            <td>{{ ins.payment_value|floatformat:2|bgn }}</td>
+            <td>{{ ins.rescheduled }}</td>
+            <td>{{ ins.rescheduled_date|default:"—" }}</td>
+            <td class="actions">
+              
+                <a class="btn light" href="{% url 'insurance:edit' ins.id %}">Редактирай</a>
+              <a class="btn light" href="{% url 'insurance:delete' ins.id %}">Изтрий</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <div class="muted">Няма застраховки.</div>
+  {% endif %}
+</div>
+{% endblock %}

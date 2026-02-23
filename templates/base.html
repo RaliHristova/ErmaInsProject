@@ -1,0 +1,122 @@
+﻿{% load static %}
+
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Застраховки{% endblock %}</title>
+
+  <style>
+    html { overflow-y: auto; scrollbar-gutter: stable; }
+    @supports not (scrollbar-gutter: stable) {
+      html { overflow-y: scroll; }
+    }
+    body { font-family: Arial, sans-serif; margin: 0; background: #f6f7fb; }
+    header {background: linear-gradient(90deg, #f472b6, #ec4899);color: #fff;padding: 12px 16px;}
+    nav { display: flex; gap: 36px; flex-wrap: wrap; align-items: center; }
+    nav.top-nav {display: flex;gap: 32px;flex-wrap: wrap;align-items: center;}
+    nav.top-nav .brand {display: inline-flex;align-items: center;padding: 0;margin-right: 2px;}
+    nav.top-nav .brand:hover {background: transparent;}
+    .brand-logo {height: 50px;width: auto;display: block;}
+    nav a {color: #1f2937;text-decoration: none;padding: 6px 10px;border-radius: 6px;position: relative;}
+    nav a::after {content: "";position: absolute;left: 10px;right: 10px;bottom: 4px;height: 2px;background: rgba(255, 255, 255, 0.9);transform: scaleX(0);transform-origin: left;transition: transform 160ms ease-in-out}  
+    nav a.active {background: rgba(255,255,255,0.18);font-weight: 700;}
+    nav a.active::after {transform: scaleX(1);}
+
+    nav a:hover::after {transform: scaleX(1);}
+    nav a:hover {background: rgba(255,255,255,0.12);}
+    
+    main {
+        max-width: 1100px; margin: 0 auto;
+        padding: 18px 16px 70px;
+    }
+    .grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+    @media(min-width: 900px) { .grid { grid-template-columns: 1fr 1fr; } }
+
+    .card { background: #fff; border-radius: 10px; padding: 14px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
+    .card h2 { margin: 0 0 10px 0; font-size: 18px; }
+    .muted { color: #64748b; font-size: 13px; }
+
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { border-bottom: 1px solid #e2e8f0; text-align: left; padding: 8px; font-size: 14px; }
+    th { background: #f1f5f9; font-weight: 600; }
+    tr:hover td { background: #fafafa; }
+
+    .badge { display: inline-block; padding: 3px 8px; border-radius: 999px; font-size: 12px; }
+    .badge.red { background: #fce7f3;color: #9d174d;}
+    .badge.blue {   background: #fdf2f8;color: #be185d;}
+    .badge.gray { background: #e2e8f0; color: #334155; }
+
+    .actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .btn { border: 0; border-radius: 8px; padding: 6px 10px; cursor: pointer; font-size: 13px; }
+    .btn.primary {background: linear-gradient(90deg, #f472b6, #ec4899);color: #fff;}
+    .btn.primary:hover {background: linear-gradient(90deg, #ec4899, #db2777);}
+    .btn.light {background: #fce7f3;color: #9d174d; }
+    .btn.light:hover {background: #fbcfe8; }
+
+    .top-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+    .form-row { margin-bottom: 12px; }
+    .form-row label { display:block; font-size: 13px; margin-bottom: 6px; color:#0f172a; font-weight: 600; }
+    .form-row input, .form-row select, .form-row textarea {
+      width: 100%; padding: 9px 10px; border-radius: 8px; border: 1px solid #cbd5e1; background:#fff;
+    }
+    .form-row input:focus, .form-row select:focus, .form-row textarea:focus {
+    outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+    }
+
+    .field-error input, .field-error select, .field-error textarea { border-color: #ef4444; }
+    .error-text { color: #b91c1c; font-size: 13px; margin-top: 6px; }
+    .help-text { color: #64748b; font-size: 12px; margin-top: 6px; }
+    .form-errors { background:#fee2e2; border:1px solid #fecaca; color:#991b1b; padding:10px; border-radius:10px; margin-bottom:12px; }
+    .form-row { margin-bottom: 12px; }
+    .form-row label { display:block; font-size: 13px; margin-bottom: 6px; color:#0f172a; font-weight: 600; }
+    .form-row input, .form-row select, .form-row textarea {
+    width: 90%; padding: 9px 10px; border-radius: 8px; border: 1px solid #cbd5e1; background:#fff;
+    }
+    .field-error input, .field-error select, .field-error textarea { border-color: #ef4444; }
+    .error-text { color: #b91c1c; font-size: 13px; margin-top: 6px; }
+    .help-text { color: #64748b; font-size: 12px; margin-top: 6px; }
+    .form-errors { background:#fee2e2; border:1px solid #fecaca; color:#991b1b; padding:10px; border-radius:10px; margin-bottom:12px; }
+    .form-row input[type="checkbox"], .form-row input[type="radio"] { width: auto; padding: 0; }
+    .inline-checkbox-label { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 0; }
+
+    footer.site-footer {position: fixed;left: 0;right: 0;bottom: 0;z-index: 999;background: linear-gradient(90deg, #f472b6, #ec4899);color: #fff;padding: 10px 16px;font-size: 18px;}
+
+    footer.site-footer .footer-inner {max-width: 1100px;margin: 0 auto;display: flex;flex-wrap: wrap;gap: 10px;align-items: center;justify-content: center;text-align: center;}
+  </style>
+</head>
+
+<body>
+    <header>
+        <nav>
+            <nav class="top-nav">
+                <a class="brand" href="{% url 'home' %}">
+                    <img src="{% static 'img/img.png' %}" alt="ErmaIns" class="brand-logo">
+                </a>
+                <a href="{% url 'home' %}" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">Начало</a>
+                <a href="{% url 'customers:list' %}" 
+                   class="{% if request.resolver_match.namespace == 'customers' %}active{% endif %}">Клиенти</a>
+                <a href="{% url 'vehicles:list' %}"
+                   class="{% if request.resolver_match.namespace == 'vehicles' %}active{% endif %}">Автомобили</a>
+                <a href="{% url 'insurance:list' %}"
+                   class="{% if request.resolver_match.namespace == 'insurance' %}active{% endif %}">Застраховки</a>
+                <a href="{% url 'payments:list' %}"
+                   class="{% if request.resolver_match.namespace == 'payments' %}active{% endif %}">Плащания</a>
+                <a href="{% url 'intermediaries:list' %}"
+                   class="{% if request.resolver_match.namespace == 'intermediaries' %}active{% endif %}">Посредници</a>
+                
+            </nav>
+        </nav>
+    </header>
+
+    <main>
+      {% block content %}{% endblock %}
+    </main>
+    <footer>
+        {% include "common/footer.html" %}
+    </footer>
+</body>
+</html>
+
+

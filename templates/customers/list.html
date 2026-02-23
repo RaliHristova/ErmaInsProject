@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Клиенти{% endblock %}
+
+{% block content %}
+<div class="card">
+  <h2>Клиенти</h2>
+  <div class="actions">
+    <a class="btn primary" href="{% url 'customers:create' %}">+ Добави клиент</a>
+  </div>
+
+  {% if customers %}
+    <table>
+      <thead>
+        <tr>
+          <th>№</th>
+          <th>Име</th>
+          <th>ЕГН</th>
+          <th>Тел</th>
+          <th>Град</th>
+          <th>Посредници</th>
+          <th>Действия</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in customers %}
+          <tr>
+            <td>{{ c.id }}</td>
+            <td><a href="{% url 'customers:detail' c.id %}">{{ c.first_name }} {{ c.last_name }}</a></td>
+            <td>{{ c.owner_ucn }}</td>
+            <td>{{ c.tel_num }}</td>
+            <td>{{ c.city }}</td>
+            <td>
+              {% with linked_intermediaries=c.intermediaries.all %}
+                {% if linked_intermediaries %}
+                  {% for i in linked_intermediaries %}
+                    <a href="{% url 'intermediaries:detail' i.id %}">{{ i.name }}</a>{% if not forloop.last %}, {% endif %}
+                  {% endfor %}
+                {% else %}
+                  —
+                {% endif %}
+              {% endwith %}
+            </td>
+            <td class="actions">
+              <a class="btn light" href="{% url 'customers:edit' c.id %}">Редактирай</a>
+              <a class="btn light" href="{% url 'customers:delete' c.id %}">Изтрий</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <div class="muted">Няма клиенти.</div>
+  {% endif %}
+</div>
+{% endblock %}
